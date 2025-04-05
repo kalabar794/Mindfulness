@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useMemo } from 'react';
+import React, { useRef, useEffect, useMemo, useState } from 'react';
 
 interface CircleProps {
   size: number;
@@ -30,9 +30,46 @@ const Circle: React.FC<CircleProps> = ({ size, posX, posY, color, delay, index }
   );
 };
 
-const MindfulnessScene: React.FC = () => {
+interface MindfulnessSceneProps {
+  onComplete?: () => void;
+  duration?: number;
+}
+
+const MindfulnessScene: React.FC<MindfulnessSceneProps> = ({ 
+  onComplete,
+  duration = 5 * 60 // Default 5 minutes in seconds
+}) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<number>(0);
+  const [timeRemaining, setTimeRemaining] = useState(duration);
+  
+  // Handle timer for session completion
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+    
+    if (duration > 0) {
+      setTimeRemaining(duration);
+      
+      intervalId = setInterval(() => {
+        setTimeRemaining(prev => {
+          if (prev <= 1) {
+            clearInterval(intervalId);
+            if (onComplete) {
+              onComplete();
+            }
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [duration, onComplete]);
   
   // Generate circles only once with useMemo
   const circles = useMemo(() => {
@@ -101,8 +138,15 @@ const MindfulnessScene: React.FC = () => {
     };
   }, []);
   
+  // Format remaining time as mm:ss
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+  
   return (
-    <div className="w-full h-screen bg-gradient-to-b from-blue-500 to-purple-600 overflow-hidden">
+    <div className="w-full h-full bg-gradient-to-b from-blue-500 to-purple-600 overflow-hidden">
       {/* Add animation keyframes using CSS-in-JS for better performance */}
       <style jsx global>{`
         @keyframes fadeIn {
@@ -142,6 +186,13 @@ const MindfulnessScene: React.FC = () => {
         {circles.map((circle, i) => (
           <Circle key={i} {...circle} index={i} />
         ))}
+        
+        {/* Timer display */}
+        <div className="absolute top-4 left-0 right-0 mx-auto text-center">
+          <div className="inline-block px-4 py-2 bg-black bg-opacity-30 backdrop-blur-sm rounded-full text-white font-mono text-xl">
+            {formatTime(timeRemaining)}
+          </div>
+        </div>
         
         {/* Optimized breathing circle with CSS animations */}
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 will-change-transform">

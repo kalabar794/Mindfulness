@@ -33,6 +33,14 @@ const HomeScreen: React.FC = () => {
       route: '/breathing',
       color: 'from-indigo-600 to-blue-400',
       icon: '/globe.svg'
+    },
+    {
+      id: 'moods',
+      title: 'Mood Tracker',
+      description: 'Track mood improvement from mindfulness',
+      route: '/moods',
+      color: 'from-emerald-500 to-green-500',
+      icon: '/window.svg'
     }
   ];
 
@@ -46,7 +54,7 @@ const HomeScreen: React.FC = () => {
           Find your center with guided meditation and breathing exercises
         </p>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-xl mx-auto mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 max-w-3xl mx-auto mb-12">
           {exercises.map((exercise) => (
             <div 
               key={exercise.id}

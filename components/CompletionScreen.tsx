@@ -3,12 +3,21 @@ import { useRouter } from 'next/router';
 
 interface CompletionScreenProps {
   duration: number;
+  sessionType: string;
+  onViewStats?: () => void;
 }
 
-const CompletionScreen: React.FC<CompletionScreenProps> = ({ duration }) => {
+const CompletionScreen: React.FC<CompletionScreenProps> = ({ 
+  duration,
+  sessionType = 'Mindfulness Session',
+  onViewStats
+}) => {
   const router = useRouter();
   const [isVisible, setIsVisible] = useState(false);
   const [quote, setQuote] = useState('');
+
+  // Calculate minutes from seconds
+  const durationMinutes = Math.round(duration / 60);
 
   // Collection of mindfulness quotes
   const quotes = [
@@ -31,7 +40,7 @@ const CompletionScreen: React.FC<CompletionScreenProps> = ({ duration }) => {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-green-500 to-blue-600 transition-opacity duration-1000">
-      <div className={`max-w-md w-full mx-4 px-6 py-8 rounded-lg bg-white bg-opacity-90 transform transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+      <div className={`max-w-md w-full mx-4 px-6 py-8 rounded-lg bg-white bg-opacity-90 backdrop-blur-sm shadow-xl transform transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
         <div className="flex justify-center mb-6">
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-10 h-10 text-green-600">
@@ -44,8 +53,13 @@ const CompletionScreen: React.FC<CompletionScreenProps> = ({ duration }) => {
         
         <div className="space-y-4 mb-6">
           <div className="flex justify-between items-center border-b border-gray-200 pb-2">
+            <span className="text-gray-600">Session</span>
+            <span className="text-lg font-medium">{sessionType}</span>
+          </div>
+          
+          <div className="flex justify-between items-center border-b border-gray-200 pb-2">
             <span className="text-gray-600">Duration</span>
-            <span className="text-xl font-medium">{duration} minutes</span>
+            <span className="text-lg font-medium">{durationMinutes} minutes</span>
           </div>
           
           <div className="border-l-4 border-green-300 pl-4 py-2 bg-green-50 italic text-gray-700">
@@ -59,16 +73,26 @@ const CompletionScreen: React.FC<CompletionScreenProps> = ({ duration }) => {
         
         <div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-3">
           <button
-            onClick={() => router.push('/mindfulness')}
-            className="px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
-          >
-            New Session
-          </button>
-          <button
             onClick={() => router.push('/')}
             className="px-5 py-3 bg-white border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-all"
           >
             Return Home
+          </button>
+          
+          {onViewStats && (
+            <button
+              onClick={onViewStats}
+              className="px-5 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-all"
+            >
+              View Mood Stats
+            </button>
+          )}
+          
+          <button
+            onClick={() => router.push('/mindfulness')}
+            className="px-5 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
+          >
+            New Session
           </button>
         </div>
       </div>
